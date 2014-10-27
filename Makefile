@@ -44,8 +44,10 @@ $(BUILT_PYTHON_PACKAGES):
 	sudo ./chroot.sh $(BUILT_PYTHON_PACKAGES).tmp pip install $(PYTHON_PACKAGES_TO_INSTALL)
 	mkdir -p $(BUILT_PYTHON_PACKAGES)/usr/lib/python2.7
 	mkdir -p $(BUILT_PYTHON_PACKAGES)/usr/lib64/python2.7
+	mkdir -p $(BUILT_PYTHON_PACKAGES)/usr/bin
 	sudo mv $(BUILT_PYTHON_PACKAGES).tmp/usr/lib/python2.7/site-packages $(BUILT_PYTHON_PACKAGES)/usr/lib/python2.7/
 	sudo mv $(BUILT_PYTHON_PACKAGES).tmp/usr/lib64/python2.7/site-packages $(BUILT_PYTHON_PACKAGES)/usr/lib64/python2.7/
+	sudo mv $(BUILT_PYTHON_PACKAGES).tmp/usr/bin/pip $(BUILT_PYTHON_PACKAGES)/usr/bin/
 	sudo rm -fr $(BUILT_PYTHON_PACKAGES).tmp
 
 #This list of packages: PRODUCTION & RELEASE. do not add debuggers, do not add compilers
