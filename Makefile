@@ -39,7 +39,8 @@ $(BUILT_PYTHON_PACKAGES):
 	echo "Installing build packages"
 	sudo chroot $(BUILT_PYTHON_PACKAGES).tmp yum groupinstall "Development Tools" --assumeyes
 	sudo chroot $(BUILT_PYTHON_PACKAGES).tmp yum install python-devel gcc-c++ --assumeyes
-	sudo chroot $(BUILT_PYTHON_PACKAGES).tmp yum install python-pip python-devel --assumeyes
+	sudo cp externals/get-pip.py $(BUILT_PYTHON_PACKAGES).tmp/tmp/
+	sudo ./chroot.sh $(BUILT_PYTHON_PACKAGES).tmp python /tmp/get-pip.py
 	sudo ./chroot.sh $(BUILT_PYTHON_PACKAGES).tmp pip install $(PYTHON_PACKAGES_TO_INSTALL)
 	mkdir -p $(BUILT_PYTHON_PACKAGES)/usr/lib/python2.7
 	mkdir -p $(BUILT_PYTHON_PACKAGES)/usr/lib64/python2.7
