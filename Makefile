@@ -19,7 +19,8 @@ $(ROOTFS): $(BUILT_PYTHON_PACKAGES)
 	-mkdir $(@D)
 	sudo -E solvent bring --repositoryBasename=rootfs-centos7-vanilla --product=rootfs --destination=$(ROOTFS).tmp
 	echo "Installing basic package list"
-	sudo chroot $(ROOTFS).tmp yum install $(RPMS_TO_INSTALL) --assumeyes
+	$(foreach rpm,$(RPMS_TO_INSTALL), sudo chroot $(ROOTFS).tmp yum install $(rpm) --assumeyes && ) true
+	$(foreach rpm,$(RPMS_TO_DOWNLOAD), sudo chroot $(ROOTFS).tmp sh -c "cd /tmp; curl $(YUMCACHE)$(rpm) -o `basename $(rpm)`; yum install ./`basename $(rpm)` --assumeyes" && ) true
 	echo "Removing defective python-six version"
 	sudo rm -fr lib/python2.7/site-packages/six-*.egg-info lib/python2.7/site-packages/six.pyc lib/python2.7/site-packages/six.pyo lib/python2.7/site-packages/six.py
 	echo "Copying prebuilt python packages"
@@ -53,27 +54,27 @@ $(BUILT_PYTHON_PACKAGES):
 #This list of packages: PRODUCTION & RELEASE. do not add debuggers, do not add compilers
 #do not add packages customized by strato, as at this build stage we do not use distrato
 RPMS_TO_INSTALL = \
-    boost-iostreams \
-    boost-program-options \
-    boost-python \
-    boost-system \
-    boost-regex \
-    boost-filesystem \
-    ethtool \
-    iperf \
-    iproute \
-    net-tools \
-    patch \
-    python-paramiko \
-    python-pip \
-    python-websockify \
-    python-greenlet \
-    python-six \
-    tar \
-    tcpdump \
-    xfsprogs \
-    xmlrpc-c-c++ \
-    redhat-lsb-core
+	boost-iostreams \
+	boost-program-options \
+	boost-python \
+	boost-system \
+	boost-regex \
+	boost-filesystem \
+	ethtool \
+	iproute \
+	net-tools \
+	patch \
+	python-six \
+	tar \
+	tcpdump \
+	xfsprogs \
+	xmlrpc-c-c++ \
+	redhat-lsb-core
+
+RPMS_TO_DOWNLOAD = \
+	mirror.nonstop.co.il/fedora/linux/releases/21/Everything/x86_64/os/Packages/i/iperf3-3.0.6-2.fc21.x86_64.rpm \
+
+YUMCACHE = http://localhost:1012/yumcache.strato:1012/
 
 #This list of python packages: basic packages, or packages that need binary compilation.
 #this makefile compiles them without contaminating the main filesystem image with
@@ -95,4 +96,7 @@ PYTHON_PACKAGES_TO_INSTALL = \
 	"requests-toolbelt==0.2.0" \
 	"netifaces==0.10.4" \
 	"netaddr==0.7.12" \
-	"bunch==1.0.1"
+	"bunch==1.0.1" \
+	"paramiko==1.12.0" \
+	"websockify==0.6.0" \
+	"greenlet==0.4.5"
