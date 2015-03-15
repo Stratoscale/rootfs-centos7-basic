@@ -28,6 +28,7 @@ $(ROOTFS): $(BUILT_PYTHON_PACKAGES)
 	echo "Verifying prebuilt python packages work"
 	sudo ./chroot.sh $(ROOTFS).tmp python -c "import zmq"
 	sudo ./chroot.sh $(ROOTFS).tmp sh -c 'if [ `python -c "import six; print six.__version__"` != "1.8.0" ]; then echo python six version does not match; fi'
+	sudo ./chroot.sh $(ROOTFS).tmp python -c "import yaml; yaml.CLoader"
 	sudo rm -fr $(ROOTFS).tmp/tmp/* $(ROOTFS).tmp/var/tmp/*
 	sudo mv $(ROOTFS).tmp $(ROOTFS)
 
@@ -39,7 +40,7 @@ $(BUILT_PYTHON_PACKAGES):
 	sudo -E solvent bring --repositoryBasename=rootfs-centos7-vanilla --product=rootfs --destination=$(BUILT_PYTHON_PACKAGES).tmp
 	echo "Installing build packages"
 	sudo chroot $(BUILT_PYTHON_PACKAGES).tmp yum groupinstall "Development Tools" --assumeyes
-	sudo chroot $(BUILT_PYTHON_PACKAGES).tmp yum install python-devel gcc-c++ --assumeyes
+	sudo chroot $(BUILT_PYTHON_PACKAGES).tmp yum install python-devel gcc-c++ libyaml-devel --assumeyes
 	sudo cp externals/get-pip.py $(BUILT_PYTHON_PACKAGES).tmp/tmp/
 	sudo ./chroot.sh $(BUILT_PYTHON_PACKAGES).tmp python /tmp/get-pip.py
 	sudo ./chroot.sh $(BUILT_PYTHON_PACKAGES).tmp pip install $(PYTHON_PACKAGES_TO_INSTALL)
@@ -62,6 +63,7 @@ RPMS_TO_INSTALL = \
 	boost-filesystem \
 	ethtool \
 	iproute \
+	libyaml \
 	net-tools \
 	patch \
 	python-six \
